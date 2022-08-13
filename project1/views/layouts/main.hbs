@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {{!-- since we have specified that the static file will be served from public folder this css will work --}}
+    <link rel="stylesheet" href="css/style.css">
+    <title>Stories</title>
+</head>
+<body>
+    {{> _header}}
+    {{> _add_btn}}
+    {{!-- container centers --}}
+    <div class="container">
+        {{{body}}}
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ckeditor/4.18.0/ckeditor.js" integrity="sha512-woYV6V3QV/oH8txWu19WqPPEtGu+dXM87N9YXP6ocsbCAH1Au9WDZ15cnk62n6/tVOmOo0rIYwx05raKdA4qyQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        // for sliding nav bar in materialize we should init it
+        M.Sidenav.init(document.querySelector('.sidenav'))
+        // initialisin the select of the form 
+        M.FormSelect.init(document.querySelector('#status'))
+        // body is the name of the textarea element we have to replace the editor with it
+        CKEDITOR.replace('body',{
+            plugins: 'wysiwygarea, toolbar, basicstyles, link'
+        })
+    </script>
+</body>
+</html>
