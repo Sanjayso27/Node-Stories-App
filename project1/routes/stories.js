@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { ensureAuth } = require("../middleware/auth");
-
+const mongoose = require("mongoose");
 const Story = require("../models/Story");
+const User = require("../models/User")
 
 router.get("/add", ensureAuth, (req, res, next) => {
   res.render("stories/add");
@@ -10,9 +11,22 @@ router.get("/add", ensureAuth, (req, res, next) => {
 
 // add stories
 router.post("/", ensureAuth, async (req, res, next) => {
+  req.body.user = req.user.id;
   try {
-    req.body.user = req.user.id;
-    await Story.create(req.body);
+    user = await User.findById(req.user.id);
+  }
+  catch(err) {
+    console.error(err);
+    res.render("error/500");
+  }
+  const createdStory = new Story(req.body)
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdStory.save({ session: sess });
+    await user.stories.push(createdStory);
+    await user.save({ session: sess });
+    await sess.commitTransaction();
     res.redirect("/dashboard");
   } catch (err) {
     console.error(err);
@@ -36,6 +50,23 @@ router.get("/", ensureAuth, async (req, res, next) => {
     res.render("err/500");
   }
 });
+
+// get based on query string
+router.get("/query/",ensureAuth,async (req,res,next)=>{
+  try {
+    const genre = req.query.genre
+    const stories = await Story.find({genre: genre,status: "public"})
+    .populate("user")
+    .sort({createdAt: "desc"})
+    .lean();
+    res.render("stories/index",{
+      stories,
+    });
+  }
+  catch (err) {
+    console.error('err/500')
+  }
+})
 
 // show all public stories of a genre
 router.get("/all/:genre",ensureAuth,async (req,res,next)=>{
@@ -118,7 +149,18 @@ router.put("/:id", ensureAuth, async (req, res, next) => {
 //delete story
 router.delete("/:id", ensureAuth, async (req, res, next) => {
   try {
-    await Story.remove({ _id: req.params.id });
+    story = await Story.findById(req.params.id).populate("user");
+  } catch (err) {
+    console.error(err);
+    return res.render("error/500");
+  }
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await story.remove({session: sess});
+    story.user.stories.pull(story);
+    await story.user.save({ session: sess });
+    await sess.commitTransaction();
     res.redirect("/dashboard");
   } catch (err) {
     console.error(err);

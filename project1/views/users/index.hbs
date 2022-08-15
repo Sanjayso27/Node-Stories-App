@@ -1,0 +1,21 @@
+<h1>Users</h1>
+<table class="stripped">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Date</th>
+            <th>No of stories</th>
+        </tr>
+    </thead>
+    <tbody>
+        {{!-- using #each we can loop through the stories --}}
+        {{#each users}}
+            <tr>
+                {{!-- since we are in the loop we don't need stories._id or stories.title --}}
+                <td><a href="/stories/user/{{_id}}">{{displayName}}</a></td>
+                <td>{{formatDate createdAt 'MMMM Do YYYY, h:mm:ss a'}}</td>
+                <td>{{stories.length}}</td>
+            </tr>
+        {{/each}}
+    </tbody>
+</table>

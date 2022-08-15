@@ -24,7 +24,8 @@ const UserSchema = new mongoose.Schema({
         type: Date,
         // either a value of the specified type or a function that returns the value of the desired type
         default: Date.now
-    }
+    },
+    stories: [{ type: mongoose.Types.ObjectId ,required:true,ref:'Story'}],
 })
 
 module.exports = mongoose.model('User',UserSchema)
